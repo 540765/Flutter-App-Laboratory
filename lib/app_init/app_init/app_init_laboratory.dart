@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_init/app_life/app_life_laboratory.dart';
 import 'package:laboratory/app_init/report_error/report_error_laboratory.dart';
-import 'package:laboratory/app_router/router/router.dart';
+import 'package:laboratory/app_router/router/router_laboratory.dart';
 
 class AppInitLaboratory {
   static void init() {
@@ -23,7 +23,7 @@ class AppInitLaboratory {
                 primarySwatch: Colors.blue,
                 useMaterial3: true,
               ),
-              routerConfig: router,
+              routerConfig: RouterLaboratory.router,
             ),
           ),
         );
