@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -31,22 +32,25 @@ class AppResponsiveLaboratory {
   ///當前使用的設計稿大小
   late Size _designSize;
 
-  ///init
-  static void init(
-    BuildContext context,
-    ResponsiveLayoutConfig designSize,
-    bool minAdapt,
-  ) {
-    return configure(
-      data: MediaQuery.maybeOf(context),
-      layoutConfig: designSize,
-    );
-  }
+  BuildContext? _context;
 
-  ///配置
-  static void configure(
-      {MediaQueryData? data,
-      required ResponsiveLayoutConfig layoutConfig}) async {
+  ///init
+  static Future<void> init(
+    BuildContext context,
+    ResponsiveLayoutConfig layoutConfig,
+    bool minAdapt,
+  ) async {
+     final navigatorContext = Navigator.maybeOf(context)?.context as Element?;
+    final mediaQueryContext =
+        navigatorContext?.getElementForInheritedWidgetOfExactType<MediaQuery>();
+    MediaQueryData? data = MediaQuery.maybeOf(context);
+
+    final initCompleter = Completer<void>();
+     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
+      mediaQueryContext?.visitChildElements((el) => _appResponsiveLaboratory._context = el);
+      if (_appResponsiveLaboratory._context != null) initCompleter.complete();
+    });
+
     try {
       if (data != null) {
         _appResponsiveLaboratory._screenData = data;
@@ -64,7 +68,7 @@ class AppResponsiveLaboratory {
     final Size deviceSize = deviceData?.size ?? layoutConfig.defaultSize;
 
     ///获取不到时宽小于高，我就认为你是竖屏
-    final orientation = deviceData?.orientation ??
+    final Orientation orientation = deviceData?.orientation ??
         (deviceSize.width < deviceSize.height
             ? Orientation.portrait
             : Orientation.landscape);
@@ -98,7 +102,9 @@ class AppResponsiveLaboratory {
 
     _appResponsiveLaboratory
       .._orientation = deviceData?.orientation ?? orientation
-      .._layoutConfig = layoutConfig;
+      .._layoutConfig = layoutConfig
+      .._context = context;
+    return initCompleter.future;
   }
 
   static Future<void> checkScreenType(

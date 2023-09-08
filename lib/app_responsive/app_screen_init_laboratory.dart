@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:laboratory/app_responsive/app_responsive_laboratory.dart';
 import 'package:laboratory/app_responsive/utils/responsive_layout_config.dart';
 
 class AppScreenInitLaboratory extends StatelessWidget {
-  const AppScreenInitLaboratory({Key? key, required this.child}) : super(key: key);
+  const AppScreenInitLaboratory({Key? key, required this.child})
+      : super(key: key);
   final Widget child;
 
   @override
@@ -14,11 +17,16 @@ class AppScreenInitLaboratory extends StatelessWidget {
       false,
     );
     debugPrint(AppResponsiveLaboratory().scaleText.toString());
-    return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaleFactor: AppResponsiveLaboratory().scaleText * 1,
-      ),
-      child: child,
-    );
+    debugPrint("初始化");
+    return FutureBuilder(
+        future: Completer<void>().future,
+        builder: (c, snapshot) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              // textScaleFactor: AppResponsiveLaboratory().scaleText * 1,
+            ),
+            child: child,
+          );
+        });
   }
 }

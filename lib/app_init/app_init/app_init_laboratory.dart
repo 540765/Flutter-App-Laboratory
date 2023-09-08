@@ -36,6 +36,8 @@ class AppInitLaboratory {
 
                 ///路由配置
                 routerConfig: RouterLaboratory.router,
+
+                
               ),
             ),
           ),

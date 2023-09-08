@@ -12,7 +12,7 @@ class ResponsiveLayoutConfig {
     this.tablet = 30,
     this.desktop = 30,
     this.minAdapt = false,
-    this.fixedPreferredOrientations = false,
+    this.fixedPreferredOrientations = false, 
   });
 
   final Size defaultSize;
