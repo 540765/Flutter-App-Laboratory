@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laboratory/app/pages/home/home_landscape/mobile/home_mobile_landscape_view.dart';
 import 'package:laboratory/app/pages/home/home_portrait/mobile/home_mobile_portrait_view.dart';
-import 'package:laboratory/app_responsive/app_responsive_builder.dart';
+import 'package:laboratory/app_responsive/utils/app_responsive_builder.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key, required this.child});

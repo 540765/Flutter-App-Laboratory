@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui show FlutterView;
 
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_responsive/utils/responsive_layout_config.dart';
 import 'package:laboratory/app_responsive/utils/screen_type.dart';
 
-class AppResponsiveLaboratory {
+class AppResponsive {
   ///全局唯一實例
-  static final AppResponsiveLaboratory _appResponsiveLaboratory =
-      AppResponsiveLaboratory._internal();
-  factory AppResponsiveLaboratory() {
-    return _appResponsiveLaboratory;
+  static final AppResponsive _appResponsive = AppResponsive._internal();
+  factory AppResponsive() {
+    return _appResponsive;
   }
-  AppResponsiveLaboratory._internal();
+  AppResponsive._internal();
 
   ///屏幕信息
   late MediaQueryData _screenData;
@@ -32,32 +32,19 @@ class AppResponsiveLaboratory {
   ///當前使用的設計稿大小
   late Size _designSize;
 
-  BuildContext? _context;
-
   ///init
-  static Future<void> init(
-    BuildContext context,
+  static void configure(
+    MediaQueryData? data,
     ResponsiveLayoutConfig layoutConfig,
     bool minAdapt,
-  ) async {
-     final navigatorContext = Navigator.maybeOf(context)?.context as Element?;
-    final mediaQueryContext =
-        navigatorContext?.getElementForInheritedWidgetOfExactType<MediaQuery>();
-    MediaQueryData? data = MediaQuery.maybeOf(context);
-
-    final initCompleter = Completer<void>();
-     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
-      mediaQueryContext?.visitChildElements((el) => _appResponsiveLaboratory._context = el);
-      if (_appResponsiveLaboratory._context != null) initCompleter.complete();
-    });
-
+  ) {
     try {
       if (data != null) {
-        _appResponsiveLaboratory._screenData = data;
+        _appResponsive._screenData = data;
       } else {
-        data = _appResponsiveLaboratory._screenData;
+        data = _appResponsive._screenData;
       }
-      _appResponsiveLaboratory._layoutConfig = layoutConfig;
+      _appResponsive._layoutConfig = layoutConfig;
     } catch (e) {
       throw Exception(
           'You must either use ScreenUtil.init or ScreenUtilInit first');
@@ -75,7 +62,7 @@ class AppResponsiveLaboratory {
 
     ///竖屏状态下的设备类型
     if (orientation == Orientation.portrait) {
-      await checkScreenType(
+      checkScreenType(
         deviceSize.width,
         deviceSize,
         layoutConfig,
@@ -87,7 +74,7 @@ class AppResponsiveLaboratory {
 
       ///横屏状态下的设备类型
     } else if (orientation == Orientation.landscape) {
-      await checkScreenType(
+      checkScreenType(
         deviceSize.height,
         deviceSize,
         layoutConfig,
@@ -100,11 +87,9 @@ class AppResponsiveLaboratory {
       throw Exception('Unknown Device Orientation');
     }
 
-    _appResponsiveLaboratory
+    _appResponsive
       .._orientation = deviceData?.orientation ?? orientation
-      .._layoutConfig = layoutConfig
-      .._context = context;
-    return initCompleter.future;
+      .._layoutConfig = layoutConfig;
   }
 
   static Future<void> checkScreenType(
@@ -116,35 +101,50 @@ class AppResponsiveLaboratory {
     double tablet,
     double desktop,
   ) async {
-    if (size < watch) {
-      _appResponsiveLaboratory._deviceScreenType = DeviceScreenType.watch;
-      _appResponsiveLaboratory._scaleText =
-          min(deviceSize.width, deviceSize.height) /
-              min(layoutConfig.watchDefaultSize.width,
-                  layoutConfig.watchDefaultSize.height);
-      _appResponsiveLaboratory._designSize = layoutConfig.watchDefaultSize;
-    } else if (size >= watch && size < mobile) {
-      _appResponsiveLaboratory._deviceScreenType = DeviceScreenType.mobile;
-      _appResponsiveLaboratory._scaleText =
-          min(deviceSize.width, deviceSize.height) /
-              min(layoutConfig.mobileDefaultSize.width,
-                  layoutConfig.mobileDefaultSize.height);
-      _appResponsiveLaboratory._designSize = layoutConfig.mobileDefaultSize;
-    } else if (size >= mobile && size < tablet) {
-      _appResponsiveLaboratory._deviceScreenType = DeviceScreenType.tablet;
-      _appResponsiveLaboratory._scaleText =
-          min(deviceSize.width, deviceSize.height) /
-              min(layoutConfig.tabletDefaultSize.width,
-                  layoutConfig.tabletDefaultSize.height);
-      _appResponsiveLaboratory._designSize = layoutConfig.tabletDefaultSize;
+    if (size < mobile) {
+      _appResponsive._deviceScreenType = DeviceScreenType.watch;
+      _appResponsive._scaleText = min(deviceSize.width, deviceSize.height) /
+          min(layoutConfig.watchDefaultSize.width,
+              layoutConfig.watchDefaultSize.height);
+      _appResponsive._designSize = layoutConfig.watchDefaultSize;
+    } else if (size < tablet) {
+      _appResponsive._deviceScreenType = DeviceScreenType.mobile;
+      _appResponsive._scaleText = min(deviceSize.width, deviceSize.height) /
+          min(layoutConfig.mobileDefaultSize.width,
+              layoutConfig.mobileDefaultSize.height);
+      _appResponsive._designSize = layoutConfig.mobileDefaultSize;
+    } else if (size < desktop) {
+      _appResponsive._deviceScreenType = DeviceScreenType.tablet;
+      _appResponsive._scaleText = min(deviceSize.width, deviceSize.height) /
+          min(layoutConfig.tabletDefaultSize.width,
+              layoutConfig.tabletDefaultSize.height);
+      _appResponsive._designSize = layoutConfig.tabletDefaultSize;
     } else {
-      _appResponsiveLaboratory._deviceScreenType = DeviceScreenType.desktop;
-      _appResponsiveLaboratory._scaleText =
-          min(deviceSize.width, deviceSize.height) /
-              min(layoutConfig.desktopDefaultSize.width,
-                  layoutConfig.desktopDefaultSize.height);
-      _appResponsiveLaboratory._designSize = layoutConfig.desktopDefaultSize;
+      _appResponsive._deviceScreenType = DeviceScreenType.desktop;
+      _appResponsive._scaleText = min(deviceSize.width, deviceSize.height) /
+          min(layoutConfig.desktopDefaultSize.width,
+              layoutConfig.desktopDefaultSize.height);
+      _appResponsive._designSize = layoutConfig.desktopDefaultSize;
     }
+  }
+
+  static Future<void> ensureScreenSize([
+    ui.FlutterView? window,
+    Duration duration = const Duration(milliseconds: 10),
+  ]) async {
+    final binding = WidgetsFlutterBinding.ensureInitialized();
+    binding.deferFirstFrame();
+
+    await Future.doWhile(() {
+      window ??= binding.platformDispatcher.implicitView;
+      if (window == null || window!.physicalSize.isEmpty) {
+        return Future.delayed(duration, () => true);
+      }
+
+      return false;
+    });
+
+    binding.allowFirstFrame();
   }
 
   ///get
@@ -176,7 +176,24 @@ class AppResponsiveLaboratory {
   double get scaleWidth => screenWidth / _designSize.width;
 
   ///寬度縮放比例
-  double get scaleHeigth => screenHeight / _designSize.height;
+  double get scaleHeight => screenHeight / _designSize.height;
+
+  ///获取适配后的值
+  ///宽度
+  double setWidth(num width) => width * scaleWidth;
+
+  ///高度
+  double setHeight(num height) => height * scaleHeight;
+
+  ///根据宽度或高度中的较小值进行适配
+  ///根据宽度或高度中较小的一个进行适配
+  double radius(num r) => r * min(scaleWidth, scaleHeight);
+
+  /// 根据宽度和高度进行自适应
+  double diagonal(num d) => d * scaleHeight * scaleWidth;
+  
+  ///字体缩放，这里没有很多操作，需要自己扩展
+  double setSp(num fontSize) => fontSize * scaleText;
 }
 
 ///擴展

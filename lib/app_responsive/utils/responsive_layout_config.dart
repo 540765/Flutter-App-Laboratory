@@ -2,15 +2,15 @@ import 'dart:ui';
 
 class ResponsiveLayoutConfig {
   const ResponsiveLayoutConfig({
-    this.defaultSize = const Size(360, 690),
-    this.mobileDefaultSize = const Size(360, 690),
-    this.tabletDefaultSize = const Size(360, 690),
-    this.desktopDefaultSize = const Size(360, 690),
-    this.watchDefaultSize = const Size(360, 690),
-    this.watch = 30,
-    this.mobile = 30,
-    this.tablet = 30,
-    this.desktop = 30,
+    this.defaultSize = const Size(360, 640),
+        this.watchDefaultSize = const Size(120, 200),
+    this.mobileDefaultSize = const Size(360, 640),
+    this.tabletDefaultSize = const Size(768, 1024),
+    this.desktopDefaultSize = const Size(1080, 900),
+    this.watch = 120,
+    this.mobile = 360,
+    this.tablet = 768,
+    this.desktop = 1080,
     this.minAdapt = false,
     this.fixedPreferredOrientations = false, 
   });

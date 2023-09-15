@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:laboratory/app_responsive/app_responsive_laboratory.dart';
+import 'package:laboratory/app_responsive/app_responsive.dart';
 import 'package:laboratory/app_responsive/utils/screen_type.dart';
 
 class AppResponsiveBuilder extends StatelessWidget {
@@ -33,9 +33,9 @@ class AppResponsiveBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Orientation orientation = AppResponsiveLaboratory().orientation;
+    Orientation orientation = AppResponsive().orientation;
     DeviceScreenType screenDeviceScreenType =
-        AppResponsiveLaboratory().deviceScreenType;
+        AppResponsive().deviceScreenType;
     if (orientation == Orientation.landscape) {
       switch (screenDeviceScreenType) {
         case DeviceScreenType.watch:
@@ -56,7 +56,7 @@ class AppResponsiveBuilder extends StatelessWidget {
         case DeviceScreenType.mobile:
           return portraitMobileBuilder(context);
         case DeviceScreenType.tablet:
-          return portraitTabletBuilder(context); 
+          return portraitTabletBuilder(context);
         case DeviceScreenType.desktop:
           return portraitDesktopBuilder(context);
         default:

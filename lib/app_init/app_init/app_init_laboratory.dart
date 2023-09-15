@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_init/app_life/app_life_laboratory.dart';
 import 'package:laboratory/app_init/report_error/report_error_laboratory.dart';
-import 'package:laboratory/app_responsive/app_screen_init_laboratory.dart';
-import 'package:laboratory/app_router/router/router_laboratory.dart';
+import 'package:laboratory/app_responsive/export_app_responsive.dart';
+import 'package:laboratory/app_router/export_app_router.dart';
 
 class AppInitLaboratory {
   static void init() {
@@ -10,8 +10,10 @@ class AppInitLaboratory {
       () {
         runApp(
           AppLifeLaboratory(
-            child: AppScreenInitLaboratory(
-              child: MaterialApp.router(
+            child: AppScreenInit(
+              responsiveLayoutConfig: const ResponsiveLayoutConfig(),
+              builder: (BuildContext context) =>
+                  MaterialApp.router(
                 /// 网格
                 debugShowMaterialGrid: false,
 
@@ -36,8 +38,6 @@ class AppInitLaboratory {
 
                 ///路由配置
                 routerConfig: RouterLaboratory.router,
-
-                
               ),
             ),
           ),

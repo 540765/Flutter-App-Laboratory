@@ -5,6 +5,6 @@ class HomeMobilePortraitView extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return const Text('2');
+    return const Text('211');
   } 
 }
