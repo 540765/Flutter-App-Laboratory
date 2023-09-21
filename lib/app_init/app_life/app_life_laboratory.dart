@@ -5,19 +5,19 @@ class AppLifeLaboratory extends StatefulWidget {
   const AppLifeLaboratory({super.key, required this.child});
   final Widget child;
   @override
-  State<AppLifeLaboratory> createState() => _AppLifeLaboratoryState();
+  State<AppLifeLaboratory> createState() => AppLifeLaboratoryState();
 }
 
-class _AppLifeLaboratoryState extends State<AppLifeLaboratory> {
-  late final AppLifecycleListener _listener;
-  // ignore: unused_field
-  late AppLifecycleState? _state;
+class AppLifeLaboratoryState extends State<AppLifeLaboratory> {
+  late final AppLifecycleListener listener;
+  late AppLifecycleState? state;
+  late String? stateName;
 
   @override
   void initState() {
     super.initState();
-    _state = SchedulerBinding.instance.lifecycleState;
-    _listener = AppLifecycleListener(
+    state = SchedulerBinding.instance.lifecycleState;
+    listener = AppLifecycleListener(
       onShow: () => _handleTransition('show'),
       onResume: () => _handleTransition('resume'),
       onHide: () => _handleTransition('hide'),
@@ -32,16 +32,18 @@ class _AppLifeLaboratoryState extends State<AppLifeLaboratory> {
 
   @override
   void dispose() {
-    _listener.dispose();
+    listener.dispose();
     super.dispose();
   }
 
   void _handleTransition(String name) {
     debugPrint("app:$name");
+    stateName = name;
   }
 
   void _handleStateChange(AppLifecycleState state) {
     debugPrint("app状态每次改变我都会触发");
+    this.state = state;
   }
 
   @override
