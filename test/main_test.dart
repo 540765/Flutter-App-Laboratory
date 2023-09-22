@@ -5,21 +5,15 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'unit_test/main_unit_test.dart' as unit_test;
+import 'widget_test/main_widget_test.dart' as widget_test;
 
 void main() {
-  debugDefaultTargetPlatformOverride = null;
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Text('data'), // 替换为要测试的小部件
-        ),
-      ),
-    );
+  ///这里可以运行所有的测试套件---不怎么写了
+  ///要分开测试到每个目录的文件下都会有一个整合当前模块的测试套件
+  group('全局main测试套件', () {
+    unit_test.main();
+    widget_test.main();
   });
 }

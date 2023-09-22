@@ -38,12 +38,18 @@ class AppLifeLaboratoryState extends State<AppLifeLaboratory> {
 
   void _handleTransition(String name) {
     debugPrint("app:$name");
-    stateName = name;
+    ///setState不可取，我这里只是为了配合widget测试
+    setState(() {
+      stateName = name;
+    });
   }
 
   void _handleStateChange(AppLifecycleState state) {
     debugPrint("app状态每次改变我都会触发");
-    this.state = state;
+    ///setState不可取，我这里只是为了配合widget测试
+    setState(() {
+      this.state = state;
+    });
   }
 
   @override
