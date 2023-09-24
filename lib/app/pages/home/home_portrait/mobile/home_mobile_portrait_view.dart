@@ -9,6 +9,7 @@ class HomeMobilePortraitView extends StatelessWidget {
       child: Container(
         color: Colors.white,
         child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
             return const ListTile(
               title: Text('title'),
