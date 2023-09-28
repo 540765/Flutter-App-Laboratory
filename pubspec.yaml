@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
 
   # 路由管理 
-  go_router: ^10.1.2
+  go_router: ^11.1.2
 
   # Cupertino Icons font
   cupertino_icons: ^1.0.2
