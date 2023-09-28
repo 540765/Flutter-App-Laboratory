@@ -7,7 +7,7 @@ import 'package:laboratory/app_widget/app_laboratory_refresh/share_data/share_en
 abstract class Indicator {
   const Indicator({
     required this.triggerOffset,
-    this.position = IndicatorPosition.above,
+    this.position = IndicatorPosition.above, 
   });
 
   // ///触发指示器的滑动距离

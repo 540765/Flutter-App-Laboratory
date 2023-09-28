@@ -69,13 +69,11 @@ abstract class IndicatorNotifier extends ChangeNotifier {
 
   ///初始化动画控制器
   void _initClampingAnimation() {
-    debugPrint('initClampingAnimation');
     clampingAnimationController = AnimationController.unbounded(
       vsync: vsync,
     );
     clampingAnimationController!.addListener(() {
       if (mounted) {
-        debugPrint('clampingAnimationController addListener');
         notifyListeners();
       }
     });
@@ -104,6 +102,7 @@ abstract class IndicatorNotifier extends ChangeNotifier {
   ///[bySimulation] 是否是模拟触发
   ///[position] 滑动的位置信息
   void updateOffset(ScrollMetrics position, double value, bool bySimulation) {
+    debugPrint('updateOffset:$mode');
     if (modeLocked) {
       //要判断是否已经在刷新过程中，如果有进行的任务则不进行任何操作
       return;
@@ -121,9 +120,15 @@ abstract class IndicatorNotifier extends ChangeNotifier {
       //返回
       return;
     }
-    //判断是否更新指示器状态
-    updateMode(oldOffset);
-
+    //bySimulation为true说明是模拟触发，不需要判断是否满足刷新条件
+    //bySimulation为false说明是用户触发，需要判断是否满足刷新条件
+    if (bySimulation) {
+      //判断是否更新指示器状态
+      updateMode(oldOffset);
+    }
+    if (!bySimulation) {
+      updateMode(oldOffset);
+    }
     //更新指示器
     notifyListeners();
   }
@@ -134,30 +139,54 @@ abstract class IndicatorNotifier extends ChangeNotifier {
       return;
     }
     //没有刷新任务也应该return
-    if (task == null) {
-      return;
-    }
+    // if (task == null) {
+    //   return;
+    // }
     //判断是否在刷新中
     if (!modeLocked) {
-      //任务处于已经完成状态
-      if (mode == IndicatorMode.done &&
-          position!.maxScrollExtent != position!.minScrollExtent) {
-        //要定义一个结果来判断是否改变mode状态
-        //如果结果为失败，说明任务已经结束
-        if (result == IndicatorResult.fail ||
-            result == IndicatorResult.noMore &&
-                oldOffset != null &&
-                oldOffset < offset) {
-          //任务失败状态时恢复状态
-          result = IndicatorResult.none;
-          //这里还在进行中是因为要展示一会结果
+      //没有任务
+      if (userOffsetNotifier.value) {
+        //用户没有松开手指
+        if (offset >= indicator.triggerOffset) {
+          //滑动距离大于触发距离
+          mode = IndicatorMode.armed;
+        }
+        if (offset < indicator.triggerOffset) {
+          //滑动距离小于触发距离
+          mode = IndicatorMode.drag;
+        }
+      }
+      if (!userOffsetNotifier.value) {
+        //用户松开手指
+        if (offset >= indicator.triggerOffset) {
+          //滑动距离大于触发距离
+          mode = IndicatorMode.ready;
+        }
+        if (offset == indicator.triggerOffset) {
           mode = IndicatorMode.processing;
-        }else{
-          //任务成功状态时恢复状态
-          return;
+        }
+        if (mode == IndicatorMode.processing) {
+          //执行任务
+          onTask();
+        }
+        if(mode == IndicatorMode.processed){
+          mode = IndicatorMode.inactive;
         }
       }
     }
+  }
+
+  //执行任务并处理结果。
+  void onTask() async {
+    await Future.delayed(const Duration(seconds: 2));
+    //任务完成
+    result = IndicatorResult.success;
+    await Future.delayed(const Duration(seconds: 1));
+    mode = IndicatorMode.processed;
+    await Future.delayed(const Duration(seconds: 1));
+    Future(() {
+      updateOffset(position!, position!.pixels, false);
+    });
   }
 
   /// 指示器监听器
@@ -183,6 +212,13 @@ abstract class IndicatorNotifier extends ChangeNotifier {
       });
     }
     this.position = position;
+    final oldMode = mode;
+    //判断是否满足刷新条件--注意不直接调用更新mode
+    updateOffset(position, position.pixels, true);
+    //滑动大于0，且状态为armed，并且没有任务
+    if (offset > 0 && (oldMode == IndicatorMode.armed) || !modeLocked) {
+      //开始动画
+    }
   }
 
   ///指示器的状态

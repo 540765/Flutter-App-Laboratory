@@ -1,13 +1,20 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_widget/app_laboratory_refresh/indicator/indicator_state.dart';
+import 'package:laboratory/app_widget/app_laboratory_refresh/share_data/share_enum.dart';
 
 class ClassicIndicator extends StatefulWidget {
   /// Indicator properties and state.
   final IndicatorState state;
 
+  ///指示器的位置
+  final MainAxisAlignment mainAxisAlignment;
+
   const ClassicIndicator({
     Key? key,
     required this.state,
+    required this.mainAxisAlignment,
   }) : super(key: key);
 
   @override
@@ -54,11 +61,13 @@ class _ClassicIndicatorState extends State<ClassicIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final offset =
-        widget.state.offset > 0 ? widget.state.offset : -(widget.state.offset);
     return SizedBox(
-      width: double.infinity,
-      height: offset,
+      width: widget.state.axis == Axis.vertical
+          ? double.infinity
+          : widget.state.offset,
+      height: widget.state.axis == Axis.horizontal
+          ? double.infinity
+          : widget.state.offset,
       child: widget.state.axis == Axis.vertical
           ? _buildVertical()
           : _buildHorizontal(),
@@ -97,6 +106,25 @@ class _ClassicIndicatorState extends State<ClassicIndicator>
     );
   }
 
+  ///根据状态改变文字
+  String get _currentText {
+    switch (widget.state.mode) {
+      case IndicatorMode.inactive:
+        return '下拉加载更多';
+      case IndicatorMode.drag:
+        return 'widget.dragText';
+      case IndicatorMode.armed:
+        return 'widget.armedText';
+      case IndicatorMode.ready:
+        return 'widget.readyText';
+      case IndicatorMode.processing:
+        return 'widget.processingText';
+      case IndicatorMode.processed:
+      default:
+        return '没有更多数据了';
+    }
+  }
+
   /// Message text.
   String get _messageText {
     String fillChar = _updateTime.minute < 10 ? "0" : "";
@@ -110,22 +138,35 @@ class _ClassicIndicatorState extends State<ClassicIndicator>
 
   ///纵向滚动渲染
   Widget _buildVertical() {
-    final offset =
-        widget.state.offset < 0 ? -(widget.state.offset) : widget.state.offset;
-    return Stack(
-      clipBehavior: Clip.hardEdge,
-      children: [
+    final children = <Widget>[];
+    if (widget.mainAxisAlignment == MainAxisAlignment.end) {
+      children.add(
         Positioned(
           left: 0,
           right: 0,
-          // top: offset/2,
-          bottom: offset / 2,
-          height: widget.state.offset < offset ? offset : null,
+          top: widget.mainAxisAlignment == MainAxisAlignment.end ? 0 : null,
           child: Center(
             child: _buildVerticalBody(),
           ),
         ),
-      ],
+      );
+    }
+    if (widget.mainAxisAlignment == MainAxisAlignment.start) {
+      children.add(
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom:
+              widget.mainAxisAlignment == MainAxisAlignment.start ? 0 : null,
+          child: Center(
+            child: _buildVerticalBody(),
+          ),
+        ),
+      );
+    }
+    return Stack(
+      clipBehavior: Clip.hardEdge,
+      children: children,
     );
   }
 
@@ -134,8 +175,8 @@ class _ClassicIndicatorState extends State<ClassicIndicator>
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.black,
-          width: 1.0,
+          color: const Color.fromARGB(31, 255, 1, 1),
+          width: 5,
         ),
       ),
       alignment: Alignment.center,
@@ -151,9 +192,9 @@ class _ClassicIndicatorState extends State<ClassicIndicator>
             alignment: Alignment.center,
             child: Column(
               children: [
-                const Text(
-                  '下拉刷新',
-                  style: TextStyle(
+                Text(
+                  _currentText,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black,
                   ),

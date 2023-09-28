@@ -29,12 +29,6 @@ enum IndicatorPosition {
 
   ///底部
   behind,
-
-  ///定位器
-  locator,
-
-  ///自定义
-  custom,
 }
 
 /// 任务完成后返回的状态。

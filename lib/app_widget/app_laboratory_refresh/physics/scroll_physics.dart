@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_widget/app_laboratory_refresh/notifier/footer_notifier/footer_notifier.dart';
 import 'package:laboratory/app_widget/app_laboratory_refresh/notifier/header_notifier/header_notifier.dart';
+import 'package:laboratory/app_widget/app_laboratory_refresh/share_data/share_enum.dart';
 
 ///摩擦因子，表现为越滑动越困难
 typedef FrictionFactor = double Function(double overscrollFraction);
@@ -14,11 +15,29 @@ class RefreshScrollPhysics extends BouncingScrollPhysics {
   }) : super(parent: parent) {
     headerNotifier.bindPhysics(this);
     footerNotifier.bindPhysics(this);
+    headerSimulationCreationState =
+        ValueNotifier(BallisticSimulationCreationState(
+      mode: headerNotifier.mode,
+      offset: headerNotifier.offset,
+      actualTriggerOffset: 70,
+    ));
+    footerSimulationCreationState =
+        ValueNotifier(BallisticSimulationCreationState(
+      mode: footerNotifier.mode,
+      offset: footerNotifier.offset,
+      actualTriggerOffset: 70,
+    ));
   }
 
   final ValueNotifier<bool> userOffsetNotifier;
   final HeaderNotifier headerNotifier;
   final FooterNotifier footerNotifier;
+
+  /// 创建 BallisticSimulation 时指示器的状态。
+  late final ValueNotifier<BallisticSimulationCreationState>
+      headerSimulationCreationState;
+  late final ValueNotifier<BallisticSimulationCreationState>
+      footerSimulationCreationState;
 
   ///动画更新传递上一帧的东西
   @override
@@ -54,8 +73,7 @@ class RefreshScrollPhysics extends BouncingScrollPhysics {
 
     ///滑动到达底部
     if (value > position.maxScrollExtent) {
-      updateIndicatorOffset(
-          position, (position.maxScrollExtent + value), value);
+      updateIndicatorOffset(position, value, value);
     }
     return super.applyBoundaryConditions(position, value);
   }
@@ -66,6 +84,24 @@ class RefreshScrollPhysics extends BouncingScrollPhysics {
     userOffsetNotifier.value = false;
     headerNotifier.updateBySimulation(position, velocity);
     footerNotifier.updateBySimulation(position, velocity);
+    //构建弹道模拟
+    final hState = BallisticSimulationCreationState(
+      mode: headerNotifier.mode,
+      offset: headerNotifier.offset,
+      actualTriggerOffset: 70,
+    );
+    final fState = BallisticSimulationCreationState(
+      mode: footerNotifier.mode,
+      offset: footerNotifier.offset,
+      actualTriggerOffset: 70,
+    );
+    headerSimulationCreationState.value = hState;
+    footerSimulationCreationState.value = fState;
+    //判断是否需要创建弹道模拟
+    if (headerSimulationCreationState.value.needCreation(hState) ||
+        footerSimulationCreationState.value.needCreation(fState)) {
+      return null;
+    }
     return super.createBallisticSimulation(position, velocity);
   }
 
@@ -91,5 +127,26 @@ class RefreshScrollPhysics extends BouncingScrollPhysics {
       footerNotifier.axis = position.axis;
       footerNotifier.axisDirection = position.axisDirection;
     }
+  }
+}
+
+/// 创建弹道模拟时指示器的状态。
+/// 用于确定是否需要创建弹道模拟。
+class BallisticSimulationCreationState {
+  final IndicatorMode mode;
+  final double offset;
+  final double actualTriggerOffset;
+
+  const BallisticSimulationCreationState({
+    required this.mode,
+    required this.offset,
+    required this.actualTriggerOffset,
+  });
+
+  bool needCreation(BallisticSimulationCreationState newState) {
+    return mode != newState.mode ||
+        offset != newState.offset ||
+        (newState.mode == IndicatorMode.ready &&
+            newState.offset >= actualTriggerOffset);
   }
 }

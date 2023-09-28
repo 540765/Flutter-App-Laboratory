@@ -5,9 +5,11 @@ import 'package:laboratory/app_widget/app_laboratory_refresh/style/classic/class
 
 class ClassicFooter extends Footer {
   final Key? key;
+  final MainAxisAlignment mainAxisAlignment;
   ClassicFooter({
     this.key,
     double triggerOffset = 70,
+    this.mainAxisAlignment = MainAxisAlignment.end,
   }) : super(
           triggerOffset: triggerOffset,
         );
@@ -16,6 +18,7 @@ class ClassicFooter extends Footer {
   Widget build(BuildContext context, IndicatorState state) {
     return ClassicIndicator(
       state: state,
+      mainAxisAlignment: mainAxisAlignment,
     );
   }
 }

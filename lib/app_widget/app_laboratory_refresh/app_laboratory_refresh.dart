@@ -97,6 +97,7 @@ class AppLaboratoryRefreshState extends State<AppLaboratoryRefresh>
 
     //底部
     if (data.footerNotifier.indicator.position == IndicatorPosition.above) {
+
       children.add(buildFooter());
     }
     return ClipPath(
@@ -130,7 +131,7 @@ class AppLaboratoryRefreshState extends State<AppLaboratoryRefresh>
       ),
     );
 
-    ///动画初始化
+    ///动画数据初始化
     physics = RefreshScrollPhysics(
       userOffsetNotifier: data.userOffsetNotifier,
       headerNotifier: data.headerNotifier,
@@ -146,7 +147,6 @@ class AppLaboratoryRefreshState extends State<AppLaboratoryRefresh>
         if (data.headerNotifier.axisDirection == null) {
           return const SizedBox.shrink();
         }
-        debugPrint('headerNotifier渲染');
         final axis = data.headerNotifier.triggerAxis;
         final axisDirection = data.headerNotifier.axisDirection;
         return Positioned(
@@ -184,17 +184,18 @@ class AppLaboratoryRefreshState extends State<AppLaboratoryRefresh>
         if (data.headerNotifier.axisDirection == null) {
           return const SizedBox.shrink();
         }
-        debugPrint('footerNotifier渲染');
+        //滚动方向
         final axis = data.footerNotifier.triggerAxis;
+        //滚动方向
         final axisDirection = data.footerNotifier.axisDirection;
         return Positioned(
           top: axis == Axis.vertical
-              ? axisDirection == AxisDirection.down
+              ? axisDirection == AxisDirection.up
                   ? 0
                   : null
               : 0,
           bottom: axis == Axis.vertical
-              ? axisDirection == AxisDirection.up
+              ? axisDirection == AxisDirection.down
                   ? 0
                   : null
               : 0,
