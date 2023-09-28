@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:laboratory/app_widget/app_laboratory_refresh/indicator/indicator_state.dart';
