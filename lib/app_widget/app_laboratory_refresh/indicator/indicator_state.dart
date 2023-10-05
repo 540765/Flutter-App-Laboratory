@@ -16,7 +16,7 @@ class IndicatorState {
   final IndicatorMode mode;
 
   // /// Task completion result.
-  // final IndicatorResult result;
+  final IndicatorResult result;
 
   /// Overscroll offset.
   final double offset;
@@ -48,7 +48,7 @@ class IndicatorState {
     // required this.notifier,
     required this.userOffsetNotifier,
     required this.mode,
-    // required this.result,
+    required this.result,
     required this.offset,
     // required this.safeOffset,
     required this.axis,
@@ -65,7 +65,7 @@ class IndicatorState {
           indicator == other.indicator &&
           // notifier == other.notifier &&
           mode == other.mode &&
-          // result == other.result &&
+          result == other.result &&
           offset == other.offset &&
           // safeOffset == other.safeOffset &&
           axis == other.axis;
@@ -78,7 +78,7 @@ class IndicatorState {
       indicator.hashCode ^
       // notifier.hashCode ^
       mode.hashCode ^
-      // result.hashCode ^
+      result.hashCode ^
       offset.hashCode ^
       // safeOffset.hashCode ^
       axis.hashCode;

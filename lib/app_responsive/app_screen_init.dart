@@ -50,7 +50,6 @@ class _AppScreenInitState extends State<AppScreenInit>
 
   ///重新验证MediaQueryData并更新小部件树
   void _revalidate([void Function()? callback]) {
-    debugPrint('revalidate 更新widget树'); 
     final oldData = _mediaQueryData;
     final newData = _newData();
 

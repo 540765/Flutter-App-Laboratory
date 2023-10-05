@@ -24,4 +24,7 @@ class FooterNotifier extends IndicatorNotifier {
     final move = value - position.maxScrollExtent;
     return value < position.maxScrollExtent ? 0 : move;
   }
+
+  @override
+  double get edgeOffset => position!.pixels - position!.maxScrollExtent;
 }

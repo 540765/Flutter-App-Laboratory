@@ -14,11 +14,11 @@ class AppLaboratoryRefresh extends StatefulWidget {
     required this.child,
     // this.simultaneously = false,
     // this.canRefreshAfterNoMore = false,
-    // this.canLoadAfterNoMore = false,
+    // this.canLoadAfterNoMore = false, 
     // this.resetAfterRefresh = true,
     // this.refreshOnStart = false,
-    // this.callRefreshOverOffset = 20,
-    // this.callLoadOverOffset = 20,
+    this.callRefreshOverOffset = 20,
+    this.callLoadOverOffset = 20,
     this.triggerAxis = Axis.vertical,
   }) : super(key: key);
   // : assert(callRefreshOverOffset > 0,
@@ -46,10 +46,10 @@ class AppLaboratoryRefresh extends StatefulWidget {
   // final bool refreshOnStart;
 
   // ///触发刷新的阀值，滑动的距离
-  // final double callRefreshOverOffset;
+  final double callRefreshOverOffset;
 
   // ///触发加载的阀值，滑动的距离
-  // final double callLoadOverOffset;
+  final double callLoadOverOffset;
 
   ///要支持滑动方向，垂直还是横向
   final Axis triggerAxis;

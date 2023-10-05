@@ -26,4 +26,7 @@ class HeaderNotifier extends IndicatorNotifier {
     final move = position.minScrollExtent - value;
     return value > position.minScrollExtent ? 0 : move;
   }
+
+  @override
+  double get edgeOffset => position!.minScrollExtent - position!.pixels;
 }

@@ -19,7 +19,6 @@ abstract class IndicatorNotifier extends ChangeNotifier {
   })  : indicator = getIndicator,
         triggerAxis = axis,
         task = taskFunction {
-    debugPrint('IndicatorNotifier init');
     _initClampingAnimation();
     userOffsetNotifier.addListener(_onUserOffset);
     mounted = true;
@@ -82,12 +81,12 @@ abstract class IndicatorNotifier extends ChangeNotifier {
   ///监听用户是否放开手指
   void _onUserOffset() {
     if (userOffsetNotifier.value) {
-      debugPrint('还没松手，暂停动画：${userOffsetNotifier.value}');
+      // debugPrint('还没松手，暂停动画：${userOffsetNotifier.value}');
       if (clampingAnimationController!.isAnimating) {
         clampingAnimationController!.stop(canceled: true);
       }
     } else {
-      debugPrint('放开手指：${userOffsetNotifier.value}');
+      // debugPrint('放开手指：${userOffsetNotifier.value}');
     }
   }
 
@@ -102,7 +101,6 @@ abstract class IndicatorNotifier extends ChangeNotifier {
   ///[bySimulation] 是否是模拟触发
   ///[position] 滑动的位置信息
   void updateOffset(ScrollMetrics position, double value, bool bySimulation) {
-    debugPrint('updateOffset:$mode');
     if (modeLocked) {
       //要判断是否已经在刷新过程中，如果有进行的任务则不进行任何操作
       return;
@@ -116,7 +114,8 @@ abstract class IndicatorNotifier extends ChangeNotifier {
     offset = calculateOffset(position, value);
     if ((oldOffset == 0 && offset == 0) && (oldMode == mode)) {
       //新旧都等于0并且状态也相同
-      //可能是没有到达边缘或者任务在1进行中
+      //可能是没有到达边缘或者任务在
+      //进行中
       //返回
       return;
     }
@@ -145,32 +144,42 @@ abstract class IndicatorNotifier extends ChangeNotifier {
     //判断是否在刷新中
     if (!modeLocked) {
       //没有任务
-      if (userOffsetNotifier.value) {
-        //用户没有松开手指
-        if (offset >= indicator.triggerOffset) {
-          //滑动距离大于触发距离
-          mode = IndicatorMode.armed;
-        }
-        if (offset < indicator.triggerOffset) {
-          //滑动距离小于触发距离
-          mode = IndicatorMode.drag;
-        }
-      }
-      if (!userOffsetNotifier.value) {
-        //用户松开手指
-        if (offset >= indicator.triggerOffset) {
-          //滑动距离大于触发距离
-          mode = IndicatorMode.ready;
-        }
-        if (offset == indicator.triggerOffset) {
-          mode = IndicatorMode.processing;
-        }
-        if (mode == IndicatorMode.processing) {
-          //执行任务
-          onTask();
-        }
-        if(mode == IndicatorMode.processed){
+      if (edgeOffset < indicator.triggerOffset) {
+        //没有到达触发阀值
+        //任务处于完成状态
+        if (mode == IndicatorMode.done) {
+          ///已经完成的恢复初始状态
           mode = IndicatorMode.inactive;
+        }
+        //默认状态
+        if (mode == IndicatorMode.inactive) {
+          return;
+        }
+        if (mode == IndicatorMode.armed) {
+          mode = IndicatorMode.drag;
+          return;
+        }
+        if (mode == IndicatorMode.drag) {
+          return;
+        }
+      } else {
+        //到达阀值
+        //任务处于完成状态
+        if (mode == IndicatorMode.done) {
+          ///已经完成的恢复初始状态
+          mode = IndicatorMode.inactive;
+        }
+        //默认状态
+        if (mode == IndicatorMode.inactive) {
+          mode = IndicatorMode.armed;
+          return;
+        }
+        if (mode == IndicatorMode.armed) {
+          return;
+        }
+        if (mode == IndicatorMode.drag) {
+          mode = IndicatorMode.armed;
+          return;
         }
       }
     }
@@ -229,8 +238,13 @@ abstract class IndicatorNotifier extends ChangeNotifier {
       axis: triggerAxis,
       mode: mode,
       offset: offset,
+      result: result,
     );
   }
+
+  ///需要重写，距离边缘的距离
+  ///类似于offset
+  double get edgeOffset;
 
   ///需要重写
   Widget build(BuildContext context) {
